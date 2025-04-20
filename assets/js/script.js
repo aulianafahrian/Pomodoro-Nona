@@ -1,4 +1,4 @@
-// script.js with Swal and sound integration
+// script.js dengan Swal dan suara serta perbaikan bug + bahasa Indonesia
 
 document.addEventListener('DOMContentLoaded', () => {
     const workDurationInput = document.getElementById('workDuration');
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             work.textContent = `⏱️ Kerja: ${Math.floor(p.work / 60)} menit`;
 
             const rest = document.createElement('p');
-            rest.textContent = p.break > 0 ? `😌 Istirahat: ${Math.floor(p.break / 60)} menit` : `🎉 Sesi Selesai!`;
+            rest.textContent = p.break > 0 ? `😌 Istirahat: ${Math.floor(p.break / 60)} menit` : `🎉 Selesai!`;
 
             card.appendChild(title);
             card.appendChild(work);
@@ -79,11 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function runCycle() {
         if (currentCycleIndex >= pomodoroPlan.length) {
-            status.textContent = "All Pomodoro Cycles Completed 🎉";
+            status.textContent = "Semua siklus selesai 🎉";
             soundFinish.play();
             Swal.fire({
                 title: 'Selesai Semua! 🎉',
-                text: 'Kamu hebat! Ambil hadiah istirahat ya 💖',
+                text: 'Kamu hebat! Waktunya istirahat total 💖',
                 icon: 'success',
                 confirmButtonColor: '#ff69b4'
             });
@@ -92,11 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cycle = pomodoroPlan[currentCycleIndex];
-        const phase = cycle.work > 0 ? 'Work' : 'Break';
+        const phase = cycle.work > 0 ? 'Kerja' : 'Istirahat';
         let totalTime = cycle.work > 0 ? cycle.work : cycle.break;
         let currentTime = totalTime;
 
-        if (phase === 'Work') {
+        if (phase === 'Kerja') {
             soundStart.play();
             Swal.fire({
                 title: 'Waktunya Kerja!',
@@ -127,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(timerInterval);
                 timerInterval = null;
 
-                if (phase === 'Work') {
-                    cyclesCompleted.textContent = `Cycles Completed: ${cycle.cycle}`;
+                if (phase === 'Kerja') {
+                    cyclesCompleted.textContent = `Siklus selesai: ${cycle.cycle}`;
                 }
 
                 currentCycleIndex++;
@@ -161,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isRunning = false;
         currentCycleIndex = 0;
         pomodoroPlan = [];
-        cyclesCompleted.textContent = "Cycles Completed: 0";
-        status.textContent = "Work";
+        cyclesCompleted.textContent = "Siklus selesai: 0";
+        status.textContent = "Kerja";
         timerDisplay.textContent = "00:00";
         progress.style.width = "0%";
         updateCalculatedCycles();
@@ -187,9 +187,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const manualCycle = parseInt(cyclesInput.value) || 1;
             pomodoroPlan = [];
-            for (let i = 1; i <= manualCycle; i++) {
-                pomodoroPlan.push({ cycle: i, work: 25 * 60, break: i % 4 === 0 ? 15 * 60 : 5 * 60 });
+
+            let totalSeconds = workDuration * 60;
+            let cycleCount = 0;
+
+            while (totalSeconds > 0 && cycleCount < manualCycle) {
+                const workTime = Math.min(25 * 60, totalSeconds);
+                totalSeconds -= workTime;
+
+                let breakTime = 0;
+                if (totalSeconds > 0) {
+                    breakTime = Math.min((cycleCount + 1) % 4 === 0 ? 15 * 60 : 5 * 60, totalSeconds);
+                    totalSeconds -= breakTime;
+                }
+
+                cycleCount++;
+                pomodoroPlan.push({ cycle: cycleCount, work: workTime, break: breakTime });
             }
+
             planList.innerHTML = '';
             adaptivePlanPreview.classList.add('hidden');
         }
@@ -199,12 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(timerInterval);
         timerDisplay.textContent = "00:00";
         progress.style.width = "0%";
-        status.textContent = "Ready";
-        cyclesCompleted.textContent = "Cycles Completed: 0";
+        status.textContent = "Siap";
+        cyclesCompleted.textContent = "Siklus selesai: 0";
 
         Swal.fire({
             title: 'Pengaturan Disimpan!',
-            text: 'Klik Start untuk memulai ⏰',
+            text: 'Klik tombol Mulai untuk memulai ⏰',
             icon: 'success',
             confirmButtonColor: '#ff69b4'
         });
