@@ -1,4 +1,4 @@
-// script.js dengan Swal dan suara serta perbaikan bug + bahasa Indonesia
+// script.js dengan Swal, suara, bahasa Indonesia, istirahat panjang setiap 4 siklus, dan label status khusus
 
 document.addEventListener('DOMContentLoaded', () => {
     const workDurationInput = document.getElementById('workDuration');
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCycleIndex = 0;
     let pomodoroPlan = [];
 
-    function generatePomodoroPlan(totalMinutes, preferredWork = 25, preferredBreak = 5) {
+    function generatePomodoroPlan(totalMinutes, preferredWork = 25, preferredBreak = 5, longBreak = 15) {
         let totalSeconds = totalMinutes * 60;
         const result = [];
         let cycle = 0;
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let breakSeconds = 0;
             if (totalSeconds > 0) {
-                breakSeconds = Math.min(preferredBreak * 60, totalSeconds);
+                breakSeconds = Math.min((cycle % 4 === 0 ? longBreak * 60 : preferredBreak * 60), totalSeconds);
                 totalSeconds -= breakSeconds;
             }
 
@@ -61,7 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
             work.textContent = `⏱️ Kerja: ${Math.floor(p.work / 60)} menit`;
 
             const rest = document.createElement('p');
-            rest.textContent = p.break > 0 ? `😌 Istirahat: ${Math.floor(p.break / 60)} menit` : `🎉 Selesai!`;
+            if (p.break > 0) {
+                const isLongBreak = p.cycle % 4 === 0;
+                rest.textContent = isLongBreak
+                    ? `😴 Istirahat Panjang: ${Math.floor(p.break / 60)} menit`
+                    : `😌 Istirahat: ${Math.floor(p.break / 60)} menit`;
+            } else {
+                rest.textContent = `🎉 Selesai!`;
+            }
 
             card.appendChild(title);
             card.appendChild(work);
@@ -92,7 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const cycle = pomodoroPlan[currentCycleIndex];
-        const phase = cycle.work > 0 ? 'Kerja' : 'Istirahat';
+        const isLongBreak = cycle.cycle % 4 === 0;
+        const phase = cycle.work > 0 ? 'Kerja' : (isLongBreak ? 'Istirahat Panjang' : 'Istirahat');
         let totalTime = cycle.work > 0 ? cycle.work : cycle.break;
         let currentTime = totalTime;
 
@@ -108,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             soundBreak.play();
             Swal.fire({
-                title: 'Istirahat Dulu 😌',
+                title: phase === 'Istirahat Panjang' ? 'Saatnya Istirahat Panjang 😴' : 'Istirahat Dulu 😌',
                 text: 'Ambil napas sebentar...',
                 icon: 'info',
                 timer: 2000,
@@ -214,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(timerInterval);
         timerDisplay.textContent = "00:00";
         progress.style.width = "0%";
-        status.textContent = "Siap";
+        status.textContent = "Siap memulai!";
         cyclesCompleted.textContent = "Siklus selesai: 0";
 
         Swal.fire({
@@ -228,3 +236,4 @@ document.addEventListener('DOMContentLoaded', () => {
     displayWorkDuration.textContent = workDuration;
     updateCalculatedCycles();
 });
+// script.js selesai
