@@ -10,7 +10,7 @@ let pomodoroPlan = [];
 const workDurationInput = document.getElementById('workDuration');
 const cyclesInput = document.getElementById('cycles');
 const startButton = document.getElementById('startButton');
-const stopButton = document.getElementById('stopButton');
+const pauseButton = document.getElementById('pauseButton');
 const resetButton = document.getElementById('resetButton');
 const timerDisplay = document.getElementById('timerDisplay');
 const progress = document.getElementById('progress');
@@ -28,6 +28,9 @@ let localState = {
   timerInterval: null
 };
 
+let isPaused = false;
+let remainingTime = 0;
+
 function runCycle() {
   if (localState.currentCycleIndex >= pomodoroPlan.length) {
     status.textContent = "Semua siklus selesai 🎉";
@@ -40,7 +43,7 @@ function runCycle() {
   const cycle = pomodoroPlan[localState.currentCycleIndex];
   const isLongBreak = cycle.cycle % 4 === 0;
   const phase = localState.isOnBreak ? (isLongBreak ? 'Istirahat Panjang' : 'Istirahat') : 'Kerja';
-  let totalTime = localState.isOnBreak ? cycle.break : cycle.work;
+  let totalTime = remainingTime > 0 ? remainingTime : (localState.isOnBreak ? cycle.break : cycle.work);
 
   if (totalTime <= 0) {
     if (localState.isOnBreak) {
@@ -49,6 +52,7 @@ function runCycle() {
     } else {
       localState.isOnBreak = true;
     }
+    remainingTime = 0;
     runCycle();
     return;
   }
@@ -80,10 +84,11 @@ function runCycle() {
         localState.currentCycleIndex++;
         localState.isOnBreak = false;
       }
-
+      remainingTime = 0;
       runCycle();
     }
     totalTime--;
+    remainingTime = totalTime;
   }, 1000);
 }
 
@@ -102,14 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
   startButton.addEventListener('click', () => {
     if (localState.isRunning || pomodoroPlan.length === 0) return;
     localState.isRunning = true;
+    if (!isPaused) remainingTime = 0;
+    isPaused = false;
     runCycle();
   });
 
-  stopButton.addEventListener('click', () => {
+  pauseButton.addEventListener('click', () => {
     if (localState.timerInterval) {
       clearInterval(localState.timerInterval);
       localState.timerInterval = null;
       localState.isRunning = false;
+      isPaused = true;
     }
   });
 
@@ -117,6 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localState.timerInterval) clearInterval(localState.timerInterval);
     localState = { isRunning: false, isOnBreak: false, currentCycleIndex: 0, timerInterval: null };
     pomodoroPlan = [];
+    isPaused = false;
+    remainingTime = 0;
     cyclesCompleted.textContent = "Siklus selesai: 0";
     status.textContent = "Kerja";
     timerDisplay.textContent = "00:00";
@@ -138,6 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
     cyclesInput.value = pomodoroPlan.length;
 
     localState = { isRunning: false, isOnBreak: false, currentCycleIndex: 0, timerInterval: null };
+    isPaused = false;
+    remainingTime = 0;
     timerDisplay.textContent = "00:00";
     progress.style.width = "0%";
     status.textContent = "Siap";
@@ -148,7 +160,3 @@ document.addEventListener('DOMContentLoaded', () => {
   displayWorkDuration.textContent = workDurationInput.value;
   updateCalculatedCycles();
 });
-
-document.body.addEventListener('click', () => {
-    soundStart.load(); soundBreak.load(); soundFinish.load();
-}, { once: true });
