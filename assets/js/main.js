@@ -53,11 +53,12 @@ function sendNotification(title, body, soundKey, loop = true) {
   } else {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-        sendNotification($1, $2, $3, true);
+        sendNotification(title, body, soundKey, true);
       }
     });
   }
 };
+
 
 function runCycle() {
   if (localState.currentCycleIndex >= pomodoroPlan.length) {
@@ -91,8 +92,10 @@ function runCycle() {
     sendNotification('Mulai Bekerja 💻', 'Fokus ya! Waktunya kerja.', 'start');
     showSwal('start');
   } else {
-    sendNotification('Istirahat 😌', $2, 'break');
-    showSwal($1);
+    const breakMsg = isLongBreak ? 'Saatnya istirahat panjang.' : 'Ambil napas sebentar ya.';
+    const breakSwal = isLongBreak ? 'longbreak' : 'break';
+    sendNotification('Istirahat 😌', breakMsg, 'break');
+    showSwal(breakSwal);
   }
 
   status.textContent = `${phase} (${Math.floor(totalTime / 60)} menit)`;
@@ -131,8 +134,17 @@ function updateCalculatedCycles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (Notification.permission !== 'granted') {
-    Notification.requestPermission();
+  document.body.addEventListener('click', () => {
+    playSound('start', false);
+    playSound('break', false);
+    playSound('finish', false);
+  }, { once: true });
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission().then(permission => {
+      if (permission !== 'granted') {
+        alert("Aktifkan notifikasi untuk pengalaman terbaik");
+      }
+    });
   }
 
   workDurationInput.addEventListener('input', (e) => {
