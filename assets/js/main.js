@@ -1,6 +1,6 @@
 // main.js
 import { timerInterval, isRunning, isOnBreak, currentCycleIndex, formatTime, resetTimerState } from './timer.js';
-import { playSound } from './sound.js';
+import { playSound, stopSound } from './sound.js';
 import { showSwal } from './swal.js';
 import { generatePomodoroPlan, showPlanPreview } from './plan.js';
 
@@ -30,11 +30,39 @@ let localState = {
 
 let isPaused = false;
 let remainingTime = 0;
+let targetEndTime = null;
+
+function sendNotification(title, body, soundKey, loop = true) {
+  if (Notification.permission === 'granted') {
+    const notification = new Notification(title, {
+      body: body,
+      icon: 'assets/images/nona-cute.png'
+    });
+
+    if (soundKey) {
+      playSound(soundKey, loop);
+    }
+
+    notification.onclick = () => {
+      if (soundKey) {
+        stopSound(soundKey);
+      }
+      notification.close();
+      window.focus();
+    };
+  } else {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        sendNotification($1, $2, $3, true);
+      }
+    });
+  }
+};
 
 function runCycle() {
   if (localState.currentCycleIndex >= pomodoroPlan.length) {
     status.textContent = "Semua siklus selesai 🎉";
-    playSound('finish');
+    sendNotification('Semua Selesai 🎉', 'Kamu menyelesaikan semua siklus hari ini!', 'finish');
     showSwal('done');
     localState.isRunning = false;
     return;
@@ -57,17 +85,23 @@ function runCycle() {
     return;
   }
 
+  targetEndTime = Date.now() + totalTime * 1000;
+
   if (!localState.isOnBreak) {
-    playSound('start');
+    sendNotification('Mulai Bekerja 💻', 'Fokus ya! Waktunya kerja.', 'start');
     showSwal('start');
   } else {
-    playSound('break');
-    showSwal(isLongBreak ? 'longbreak' : 'break');
+    sendNotification('Istirahat 😌', $2, 'break');
+    showSwal($1);
   }
 
   status.textContent = `${phase} (${Math.floor(totalTime / 60)} menit)`;
 
   localState.timerInterval = setInterval(() => {
+    const now = Date.now();
+    totalTime = Math.max(0, Math.floor((targetEndTime - now) / 1000));
+    remainingTime = totalTime;
+
     timerDisplay.textContent = formatTime(totalTime);
     const totalPhaseTime = localState.isOnBreak ? cycle.break : cycle.work;
     const elapsed = totalPhaseTime - totalTime;
@@ -87,8 +121,6 @@ function runCycle() {
       remainingTime = 0;
       runCycle();
     }
-    totalTime--;
-    remainingTime = totalTime;
   }, 1000);
 }
 
@@ -99,6 +131,10 @@ function updateCalculatedCycles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+
   workDurationInput.addEventListener('input', (e) => {
     displayWorkDuration.textContent = e.target.value;
     updateCalculatedCycles();
@@ -127,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pomodoroPlan = [];
     isPaused = false;
     remainingTime = 0;
+    targetEndTime = null;
     cyclesCompleted.textContent = "Siklus selesai: 0";
     status.textContent = "Kerja";
     timerDisplay.textContent = "00:00";
@@ -150,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localState = { isRunning: false, isOnBreak: false, currentCycleIndex: 0, timerInterval: null };
     isPaused = false;
     remainingTime = 0;
+    targetEndTime = null;
     timerDisplay.textContent = "00:00";
     progress.style.width = "0%";
     status.textContent = "Siap";
@@ -160,9 +198,3 @@ document.addEventListener('DOMContentLoaded', () => {
   displayWorkDuration.textContent = workDurationInput.value;
   updateCalculatedCycles();
 });
-
-document.body.addEventListener('click', () => {
-    soundStart.load(); soundBreak.load(); soundFinish.load();
-  }, { once: true });
-  
-  
