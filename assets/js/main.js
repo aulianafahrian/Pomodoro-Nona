@@ -135,9 +135,9 @@ function updateCalculatedCycles() {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('click', () => {
-    playSound('start', false);
-    playSound('break', false);
-    playSound('finish', false);
+    // playSound('start', false);
+    // playSound('break', false);
+    // playSound('finish', false);
   }, { once: true });
   if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => {
