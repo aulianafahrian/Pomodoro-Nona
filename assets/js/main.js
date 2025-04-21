@@ -160,3 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
   displayWorkDuration.textContent = workDurationInput.value;
   updateCalculatedCycles();
 });
+
+document.body.addEventListener('click', () => {
+    soundStart.load(); soundBreak.load(); soundFinish.load();
+  }, { once: true });
+  
+  
