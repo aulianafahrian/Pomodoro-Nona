@@ -30,7 +30,7 @@ export function generatePomodoroPlan(totalMinutes, preferredWork = 25, preferred
       card.className = 'adaptive-card';
   
       const title = document.createElement('h4');
-      title.textContent = `🍓 Siklus ${p.cycle}`;
+      title.textContent = `🍫 Siklus ${p.cycle}`;
   
       const work = document.createElement('p');
       work.textContent = `⏱️ Kerja: ${Math.floor(p.work / 60)} menit`;

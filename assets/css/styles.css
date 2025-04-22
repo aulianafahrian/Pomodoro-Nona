@@ -1,13 +1,15 @@
-/* cute page */
+/* cute page (blue-brown edition) */
 body {
-    background-color: #fef2f8; /* pink-50 */
+    background-color: #eaf6fb; /* soft blue */
     font-family: 'Fredoka', cursive, sans-serif;
-    color: #333;
+    color: #4a3c36; /* soft chocolate brown */
 }
+
 h1, h2, h3 {
-    color: #ff69b4;
+    color: #6e5849; /* milk chocolate */
     text-align: center;
 }
+
 p {
     font-size: 1.2em;
     line-height: 1.5;
@@ -16,8 +18,8 @@ p {
 
 /* cute button */
 button {
-    background-color: #ff69b4;
-    color: white;
+    background-color: #a7d6f1; /* soft sky blue */
+    color: #4a3c36;
     border: none;
     padding: 10px 20px;
     text-align: center;
@@ -29,8 +31,9 @@ button {
     border-radius: 9999px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
 button:hover {
-    background-color: #ff1493;
+    background-color: #bee3f8; /* lighter blue */
     transform: scale(1.05);
 }
 
@@ -40,29 +43,30 @@ input[type="text"], input[type="email"], input[type="password"], input[type="num
     padding: 12px 20px;
     margin: 8px 0;
     display: inline-block;
-    border: 2px solid #ff69b4;
+    border: 2px solid #a7d6f1;
     border-radius: 12px;
     box-sizing: border-box;
     transition: border-color 0.3s ease;
 }
+
 input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus {
-    border-color: #ff1493;
+    border-color: #7dbfe8;
     outline: none;
 }
 
 /* cute form */
 form, .form-style {
-    background-color: #fff0f5;
+    background-color: #f9f4ef; /* creamy background */
     padding: 20px;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     max-width: 400px;
     margin: auto;
 }
 
 /* cute footer */
 footer {
-    background-color: #ff69b4;
+    background-color: #bca99d; /* light brown */
     color: white;
     text-align: center;
     padding: 10px 0;
@@ -72,22 +76,23 @@ footer {
 
 /* cute card for adaptive plan */
 .adaptive-card {
-    background-color: #ffe4ec;
-    border: 2px solid #ffb6c1;
+    background-color: #f2e9e4; /* light creamy brown */
+    border: 2px solid #d6c3b8;
     border-radius: 16px;
     padding: 16px;
-    box-shadow: 0 4px 8px rgba(255, 105, 180, 0.2);
+    box-shadow: 0 4px 8px rgba(166, 123, 91, 0.2);
     transition: transform 0.3s ease;
     width: 100%;
     max-width: 16rem;
     margin: 0 auto;
 }
+
 .adaptive-card:hover {
     transform: scale(1.03);
 }
 
 .adaptive-card h4 {
-    color: #ff1493;
+    color: #6e5849;
     font-size: 1.1rem;
     margin-bottom: 8px;
     text-align: center;
@@ -95,7 +100,7 @@ footer {
 
 .adaptive-card p {
     font-size: 0.95rem;
-    color: #333;
+    color: #4a3c36;
     text-align: center;
     margin: 2px 0;
 }
@@ -105,4 +110,45 @@ footer {
     padding-bottom: 2rem;
     justify-items: center;
     text-align: center;
+}
+
+@media (min-width: 768px) {
+  #planList {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* sweetalert theme override */
+.swal2-popup {
+    font-family: 'Fredoka', cursive, sans-serif;
+    background: #f9f4ef;
+    color: #4a3c36;
+    border: 2px solid #d6c3b8;
+    border-radius: 16px;
+}
+
+.swal2-title {
+    color: #6e5849;
+    font-size: 1.6rem;
+}
+
+.swal2-confirm {
+    background-color: #a7d6f1 !important;
+    color: #4a3c36 !important;
+    border-radius: 9999px !important;
+    font-weight: bold;
+    padding: 10px 24px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.swal2-confirm:hover {
+    background-color: #bee3f8 !important;
+    transform: scale(1.05);
+}
+
+.swal2-icon {
+    border-color: #bca99d !important;
+    color: #bca99d !important;
 }
