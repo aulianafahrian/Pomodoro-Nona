@@ -9,5 +9,9 @@ export function showSwal(type) {
         Swal.fire({ title: 'Selesai Semua! 🎉', text: 'Kamu hebat! Waktunya istirahat total 💖', icon: 'success', confirmButtonColor: '#ff69b4' });
     } else if (type === 'saved') {
         Swal.fire({ title: 'Pengaturan Disimpan!', text: 'Klik tombol Mulai untuk memulai ⏰', icon: 'success', confirmButtonColor: '#ff69b4' });
+    } else if (type === 'notif-denied') {
+        Swal.fire({ title: 'Notifikasi Ditolak!', text: 'Silakan aktifkan notifikasi di pengaturan browser.', icon: 'error', confirmButtonColor: '#ff69b4' });
+    } else if (type === 'set-not-saved') {
+        Swal.fire({ title: 'Setting Belum Disimpan', text: 'Silahkan Simpan Setting Terlebih Dahulu.', icon: 'error', confirmButtonColor: '#ff69b4' });
     }
 }

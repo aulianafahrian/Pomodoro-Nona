@@ -39,13 +39,26 @@ function sendNotification(title, body, soundKey, loop = true) {
       icon: 'assets/images/nona-cute.png'
     });
 
-    if (soundKey) {
-      playSound(soundKey, loop);
+    try {
+      if (soundKey) {
+        playSound(soundKey, loop);
+      } else {
+        playSound('finish', loop); // fallback sound
+      }
+    } catch (e) {
+      console.warn('Gagal memainkan suara notifikasi:', e);
+      playSound('finish', loop);
     }
 
     notification.onclick = () => {
-      if (soundKey) {
-        stopSound(soundKey);
+      try {
+        if (soundKey) {
+          stopSound(soundKey);
+        } else {
+          stopSound('finish');
+        }
+      } catch (e) {
+        console.warn('Gagal menghentikan suara:', e);
       }
       notification.close();
       window.focus();
@@ -54,11 +67,12 @@ function sendNotification(title, body, soundKey, loop = true) {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
         sendNotification(title, body, soundKey, true);
+      } else {
+        showSwal('notif-denied');
       }
     });
   }
-};
-
+}
 
 function runCycle() {
   if (localState.currentCycleIndex >= pomodoroPlan.length) {
@@ -70,6 +84,10 @@ function runCycle() {
   }
 
   const cycle = pomodoroPlan[localState.currentCycleIndex];
+  if (!cycle || (!cycle.work && !cycle.break)) {
+    showSwal('invalid');
+    return;
+  }
   const isLongBreak = cycle.cycle % 4 === 0;
   const phase = localState.isOnBreak ? (isLongBreak ? 'Istirahat Panjang' : 'Istirahat') : 'Kerja';
   let totalTime = remainingTime > 0 ? remainingTime : (localState.isOnBreak ? cycle.break : cycle.work);
@@ -134,15 +152,16 @@ function updateCalculatedCycles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // preload sound once on first user interaction
   document.body.addEventListener('click', () => {
     // playSound('start', false);
     // playSound('break', false);
     // playSound('finish', false);
-  }, { once: true });
+}, { once: true });
   if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => {
       if (permission !== 'granted') {
-        alert("Aktifkan notifikasi untuk pengalaman terbaik");
+        showSwal('notif-denied');
       }
     });
   }
@@ -153,7 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   startButton.addEventListener('click', () => {
-    if (localState.isRunning || pomodoroPlan.length === 0) return;
+    if (pomodoroPlan.length === 0) {
+      showSwal('set-not-saved');
+      return;
+    }
+    if (localState.isRunning) return;
     localState.isRunning = true;
     if (!isPaused) remainingTime = 0;
     isPaused = false;
@@ -184,7 +207,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('saveSettings').addEventListener('click', () => {
-    const workDuration = parseInt(workDurationInput.value);
+    // Ensure workDuration is parsed once only
+    let workDuration = parseInt(workDurationInput.value);
+    if (!workDuration || workDuration <= 0) {
+      showSwal('empty-duration');
+      return;
+    }
+    // Already initialized above
     if (adaptiveModeCheckbox.checked) {
       pomodoroPlan = generatePomodoroPlan(workDuration);
     } else {
