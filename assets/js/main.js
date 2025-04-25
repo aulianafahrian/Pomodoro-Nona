@@ -1,4 +1,3 @@
-// main.js
 import { timerInterval, isRunning, isOnBreak, currentCycleIndex, formatTime, resetTimerState } from './timer.js';
 import { playSound, stopSound } from './sound.js';
 import { showSwal } from './swal.js';
@@ -21,6 +20,7 @@ const adaptiveModeCheckbox = document.getElementById('adaptiveMode');
 const adaptivePlanPreview = document.getElementById('adaptivePlanPreview');
 const planList = document.getElementById('planList');
 
+// State variables
 let localState = {
   isRunning: false,
   isOnBreak: false,
@@ -31,6 +31,28 @@ let localState = {
 let isPaused = false;
 let remainingTime = 0;
 let targetEndTime = null;
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('Service Worker berhasil didaftarkan:', registration);
+      })
+      .catch(error => {
+        console.error('Service Worker gagal didaftarkan:', error);
+      });
+  });
+}
+
+// Request notification permission
+if ('Notification' in window && Notification.permission !== 'granted') {
+  Notification.requestPermission().then(permission => {
+    if (permission !== 'granted') {
+      showSwal('notif-denied');  // Using SweetAlert for permission denial
+    }
+  });
+}
 
 function sendNotification(title, body, soundKey, loop = true) {
   if (Notification.permission === 'granted') {
@@ -67,8 +89,6 @@ function sendNotification(title, body, soundKey, loop = true) {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
         sendNotification(title, body, soundKey, true);
-      } else {
-        showSwal('notif-denied');
       }
     });
   }
@@ -84,10 +104,6 @@ function runCycle() {
   }
 
   const cycle = pomodoroPlan[localState.currentCycleIndex];
-  if (!cycle || (!cycle.work && !cycle.break)) {
-    showSwal('invalid');
-    return;
-  }
   const isLongBreak = cycle.cycle % 4 === 0;
   const phase = localState.isOnBreak ? (isLongBreak ? 'Istirahat Panjang' : 'Istirahat') : 'Kerja';
   let totalTime = remainingTime > 0 ? remainingTime : (localState.isOnBreak ? cycle.break : cycle.work);
@@ -157,14 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // playSound('start', false);
     // playSound('break', false);
     // playSound('finish', false);
-}, { once: true });
-  if ('Notification' in window && Notification.permission !== 'granted') {
-    Notification.requestPermission().then(permission => {
-      if (permission !== 'granted') {
-        showSwal('notif-denied');
-      }
-    });
-  }
+  }, { once: true });
 
   workDurationInput.addEventListener('input', (e) => {
     displayWorkDuration.textContent = e.target.value;
@@ -173,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   startButton.addEventListener('click', () => {
     if (pomodoroPlan.length === 0) {
-      showSwal('set-not-saved');
+      showSwal('not-saved');
       return;
     }
     if (localState.isRunning) return;
@@ -207,13 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('saveSettings').addEventListener('click', () => {
-    // Ensure workDuration is parsed once only
     let workDuration = parseInt(workDurationInput.value);
     if (!workDuration || workDuration <= 0) {
       showSwal('empty-duration');
       return;
     }
-    // Already initialized above
     if (adaptiveModeCheckbox.checked) {
       pomodoroPlan = generatePomodoroPlan(workDuration);
     } else {
