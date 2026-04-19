@@ -1,29 +1,65 @@
 export function showSwal(type) {
-    if (type === 'start') {
-        Swal.fire({ title: 'Waktunya Kerja!', text: 'Fokus yuk 💻', icon: 'info', timer: 2000, showConfirmButton: false });
-    } else if (type === 'break') {
-        Swal.fire({ title: 'Istirahat Dulu 😌', text: 'Ambil napas sebentar...', icon: 'info', timer: 2000, showConfirmButton: false });
-    } else if (type === 'longbreak') {
-        Swal.fire({ title: 'Saatnya Istirahat Panjang 😴', text: 'Ambil napas sebentar...', icon: 'info', timer: 2000, showConfirmButton: false });
-    } else if (type === 'done') {
-        Swal.fire({ title: 'Selesai Semua! 🎉', text: 'Kamu hebat! Waktunya istirahat total 💖', icon: 'success', confirmButtonColor: '#a7d6f1', confirmButtonText: 'Terima Kasih!' });
-    } else if (type === 'saved') {
-        Swal.fire({ title: 'Pengaturan Tersimpan! 🥳', text: 'Waktu untuk mulai! Klik Start untuk memulai siklusmu! ⏰💪', icon: 'success', confirmButtonColor: '#a7d6f1', confirmButtonText: 'Yuk Mulai! 🚀' });
-    } else if (type === 'notif-denied') {
-        Swal.fire({
-            title: 'Oh tidak! 😢',
-            text: 'Ayo, aktifkan notifikasi di pengaturan browser agar kamu nggak ketinggalan! 🌟',
+    const base = { confirmButtonColor: '#a7d6f1', timer: undefined };
+
+    const configs = {
+        'start': {
+            title: 'Waktunya Kerja! 💻',
+            text: 'Fokus yuk, kamu pasti bisa!',
+            icon: 'info',
+            timer: 2000,
+            showConfirmButton: false
+        },
+        'break': {
+            title: 'Istirahat Dulu 😌',
+            text: 'Ambil napas sebentar, kamu hebat!',
+            icon: 'info',
+            timer: 2000,
+            showConfirmButton: false
+        },
+        'longbreak': {
+            title: 'Istirahat Panjang 😴',
+            text: 'Rebahan dulu, kamu sudah kerja keras!',
+            icon: 'info',
+            timer: 2500,
+            showConfirmButton: false
+        },
+        'done': {
+            title: 'Selesai Semua! 🎉',
+            text: 'Kamu luar biasa! Waktunya istirahat total 💖',
+            icon: 'success',
+            confirmButtonText: 'Terima Kasih! 💖',
+            ...base
+        },
+        'saved': {
+            title: 'Pengaturan Tersimpan! 🥳',
+            text: 'Klik Mulai untuk memulai siklusmu! ⏰💪',
+            icon: 'success',
+            confirmButtonText: 'Yuk Mulai! 🚀',
+            ...base
+        },
+        'notif-denied': {
+            title: 'Notifikasi Dimatikan 😢',
+            text: 'Aktifkan notifikasi di pengaturan browser agar tidak ketinggalan! 🌟',
+            icon: 'warning',
+            confirmButtonText: 'Oke, Saya Aktifkan! 💖',
+            ...base
+        },
+        'not-saved': {
+            title: 'Pengaturan Belum Disimpan 😅',
+            text: 'Buka ⚙ Pengaturan dan simpan dulu sebelum mulai!',
             icon: 'error',
-            confirmButtonColor: '#a7d6f1',
-            confirmButtonText: 'Oke! Saya Aktifkan! 💖'
-        });
-    } else if (type === 'not-saved') {
-        Swal.fire({
-            title: 'Oops! Pengaturan Belum Disimpan 😅',
-            text: 'Yuk, simpan pengaturan dulu supaya bisa mulai timer-nya! ⏰✨',
+            confirmButtonText: 'Siap! 📝',
+            ...base
+        },
+        'empty-duration': {
+            title: 'Durasi Kosong 😕',
+            text: 'Masukkan durasi kerja yang valid dulu ya!',
             icon: 'error',
-            confirmButtonColor: '#a7d6f1',
-            confirmButtonText: 'Simpan Pengaturan! 📝'
-          });
-    }
+            confirmButtonText: 'Oke!',
+            ...base
+        },
+    };
+
+    const config = configs[type];
+    if (config) Swal.fire(config);
 }
