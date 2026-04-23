@@ -207,10 +207,15 @@ body.phase-longbreak .timer-digits{ color: #4527a0; }
 
 .cycles-text {
     font-size: 0.72rem;
-    color: #a08070;
+    color: #6e5849;
     margin-top: 3px;
     letter-spacing: 0.03em;
 }
+
+body.phase-work .cycles-text      { color: #7b3a28; }
+body.phase-break .cycles-text     { color: #2e6b35; }
+body.phase-longbreak .cycles-text { color: #3d2080; }
+body.phase-done .cycles-text      { color: #7a6200; }
 
 /* ===== CONTROLS ===== */
 .controls {
@@ -399,10 +404,15 @@ footer {
     text-align: center;
     padding: 24px 0 10px;
     font-size: 0.78rem;
-    color: #a08070;
+    color: #6e5849;
 }
 
-footer strong { color: #6e5849; }
+footer strong { color: #4a3c36; }
+
+body.phase-work footer      { color: #7b3a28; }
+body.phase-break footer     { color: #2e6b35; }
+body.phase-longbreak footer { color: #3d2080; }
+body.phase-done footer      { color: #7a6200; }
 
 /* ===== SWEETALERT OVERRIDE ===== */
 .swal2-popup {
